@@ -3,14 +3,12 @@
 SMOL is a tiny DEFLATE-like compressor made for fun.
 
 ## Features
-
 - Small, dependency-free Go codebase.
 - Fast prefix Huffman decoder with optional dynamic fast-table cache.
 - Builds on TinyGo.
 - CLI with three compression levels: `fast`, `normal`, `high`.
 
 ## Installation
-
 Build from source (Go TinyGo 1.25+):
 ```bash
 git clone https://github.com/Urethramancer/smol.git

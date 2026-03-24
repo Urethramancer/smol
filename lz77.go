@@ -5,9 +5,9 @@ var (
 	windowSize   = 32768
 	minMatch     = 3
 	maxMatch     = 258
-	hashBits     = 15
+	hashBits     = 17
 	hashSize     = 1 << hashBits
-	defaultChain = 512
+	defaultChain = 4096
 )
 
 func updateHash(b []byte) uint32 {

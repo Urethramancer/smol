@@ -1,0 +1,7 @@
+/bin
+/smol
+/*.txt
+/*.gz
+/*.smol
+/*.out
+/.vscode

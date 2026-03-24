@@ -10,6 +10,7 @@ import (
 type ParsingOptions struct {
 	UseOptimal bool
 	ChainDepth int
+	// future knobs: HashBits, WindowSize, AggressiveSplitting
 }
 
 // --- Core Logic ---
@@ -34,7 +35,12 @@ func compressBlock(bw *bitWriter, data []byte, offset int, isFinal bool, po Pars
 	}
 
 	// Initial greedy parse to collect candidate frequencies and build initial trees.
-	greedyOutput := lz77GreedyPass(data, offset)
+	// Pass chain depth from parsing options to the greedy pass so we can tune probe depth.
+	chainDepth := defaultChain
+	if po.ChainDepth > 0 {
+		chainDepth = po.ChainDepth
+	}
+	greedyOutput := lz77GreedyPass(data, offset, chainDepth)
 	greedyOutput = append(greedyOutput, uint16(256)) // EOB
 
 	litLenFreq := make(map[uint16]int)

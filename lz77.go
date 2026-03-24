@@ -1,13 +1,18 @@
 package smol
 
 // --- LZ77 Implementation with Hashing---
-const (
-	windowSize, minMatch, maxMatch, hashSize = 32768, 3, 258, 1 << 15
+var (
+	windowSize   = 32768
+	minMatch     = 3
+	maxMatch     = 258
+	hashBits     = 15
+	hashSize     = 1 << hashBits
+	defaultChain = 512
 )
 
 func updateHash(b []byte) uint32 {
 	val := uint32(b[0])<<16 | uint32(b[1])<<8 | uint32(b[2])
-	return (val * 2654435761) >> (32 - 15)
+	return (val * 2654435761) >> (32 - hashBits)
 }
 
 type lz77Match struct{ Length, Distance int }
@@ -16,7 +21,7 @@ type lz77Match struct{ Length, Distance int }
 // This function implements a standard, high-performance greedy parser that
 // correctly interleaves hashing and match finding in a single pass. This resolves
 // the stream corruption bug caused by the previous two-pass implementation.
-func lz77GreedyPass(data []byte, offset int) []any {
+func lz77GreedyPass(data []byte, offset int, chainDepth int) []any {
 	var output []any
 	if offset >= len(data) {
 		return output
@@ -37,10 +42,9 @@ func lz77GreedyPass(data []byte, offset int) []any {
 			limit = 0
 		}
 
-		const maxChainDepth = 512
 		probes := 0
 
-		for chainPos != -1 && chainPos >= limit && probes < maxChainDepth {
+		for chainPos != -1 && chainPos >= limit && probes < chainDepth {
 			// Quick 3-byte check to avoid expensive comparisons
 			// Safe because we only insert positions where at least minMatch bytes remain.
 			if data[chainPos] == data[pos] &&
